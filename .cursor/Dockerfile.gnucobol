@@ -1,0 +1,17 @@
+# Alternative cloud-agent base image for legacy-settlement, NOT active by default.
+# Use it if the default image's install step can't apt-get GnuCOBOL (no sudo or
+# no package mirror). To switch, set .cursor/environment.json to:
+#   { "build": { "dockerfile": "Dockerfile.gnucobol" }, "install": "npm ci && scripts/build.sh" }
+# (dockerfile paths are relative to .cursor/; Cursor checks out the repo itself,
+# so nothing is COPY'd here.)
+FROM ubuntu:24.04
+
+RUN apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      gnucobol3 ca-certificates curl git sudo \
+ && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends nodejs \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN (id -u ubuntu >/dev/null 2>&1 || useradd -m -s /bin/bash ubuntu) \
+ && echo "ubuntu ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ubuntu

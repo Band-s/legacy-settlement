@@ -1,0 +1,3 @@
+{
+  "install": "command -v cobc >/dev/null 2>&1 || { sudo apt-get update -y && (sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gnucobol3 || sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gnucobol); }; npm ci && scripts/build.sh"
+}

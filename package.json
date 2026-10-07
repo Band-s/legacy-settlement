@@ -1,0 +1,16 @@
+{
+  "name": "legacy-settlement",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Northwind Commerce legacy card settlement batch (COBOL) and back-office reconciliation (VB6). Demo code for the Cursor exercise; not real Northwind code.",
+  "type": "module",
+  "scripts": {
+    "build": "scripts/build.sh",
+    "test": "node --import tsx --test \"test/**/*.test.ts\""
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}
