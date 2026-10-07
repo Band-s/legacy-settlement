@@ -1,7 +1,12 @@
 # java-port/ (modernization target)
 
-Empty on purpose. The port is done live in the demo, or in a pre-run on its own
-branch. Nothing here is a port yet.
+First slice: `com.northwind.settlement.FeeCalculator` is SETTLE01 paragraph
+`2230-CALCULATE` as a pure function, with JUnit covering each rounding rule.
+The batch driver that writes the full report is not ported yet.
+
+```bash
+mvn -f java-port/pom.xml test
+```
 
 ## Target
 
