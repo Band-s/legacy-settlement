@@ -1,0 +1,6 @@
+SETTLE01 SETTLEMENT REPORT  BATCH B260930006  DATE 20260930
+MERCHANT CUR     CNT              GROSS               FEES                NET
+50000001 USD       2              30.00               0.74              29.26
+OUT OF BALANCE: DETAIL COUNT                2 EXPECTED                3
+OUT OF BALANCE: HASH TOTAL              30.00 EXPECTED            40.00
+DETAIL RECORDS       2  ACCEPTED       2  REJECTED       0  UNKNOWN TYPE       0  RETURN CODE 08

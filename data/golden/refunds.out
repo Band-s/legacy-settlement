@@ -1,0 +1,6 @@
+SETTLE01 SETTLEMENT REPORT  BATCH B260930002  DATE 20260930
+MERCHANT CUR     CNT              GROSS               FEES                NET
+20000001 USD       2             150.00               2.90             147.10
+20000002 GBP       1             -80.00              -1.46             -78.54
+TRAILER CHECK OK
+DETAIL RECORDS       3  ACCEPTED       3  REJECTED       0  UNKNOWN TYPE       0  RETURN CODE 00
