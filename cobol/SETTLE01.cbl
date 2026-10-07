@@ -57,6 +57,7 @@
            05  WS-DETAIL-COUNT          PIC 9(07) VALUE 0.
            05  WS-ACCEPT-COUNT          PIC 9(07) VALUE 0.
            05  WS-REJECT-COUNT          PIC 9(07) VALUE 0.
+           05  WS-UNKNOWN-COUNT         PIC 9(07) VALUE 0.
            05  WS-HASH-TOTAL            PIC 9(13)V99 VALUE 0.
        01  WS-RETURN-CODE               PIC 99 VALUE 0.
        01  WS-PREV-MERCHANT             PIC X(08) VALUE SPACES.
@@ -73,9 +74,9 @@
            05  WS-SUM-MERCHANT          PIC X(09).
            05  WS-SUM-CURRENCY          PIC X(04).
            05  WS-SUM-COUNT             PIC ZZZZZZ9.
-           05  WS-SUM-GROSS             PIC -ZZZ,ZZZ,ZZZ,ZZ9.99.
-           05  WS-SUM-FEES              PIC -ZZZ,ZZZ,ZZZ,ZZ9.99.
-           05  WS-SUM-NET               PIC -ZZZ,ZZZ,ZZZ,ZZ9.99.
+           05  WS-SUM-GROSS             PIC ----,---,---,--9.99.
+           05  WS-SUM-FEES              PIC ----,---,---,--9.99.
+           05  WS-SUM-NET               PIC ----,---,---,--9.99.
        01  WS-REJ-LINE.
            05  FILLER                   PIC X(11) VALUE 'REJECT REC '.
            05  WS-REJ-NO                PIC 9(07).
@@ -89,6 +90,12 @@
            05  WS-OOB-ACTUAL            PIC Z(12)9.99.
            05  FILLER                   PIC X(10) VALUE ' EXPECTED '.
            05  WS-OOB-EXPECTED          PIC Z(12)9.99.
+       01  WS-OOB-CNT-LINE.
+           05  FILLER                   PIC X(29) VALUE
+               'OUT OF BALANCE: DETAIL COUNT'.
+           05  WS-OOBC-ACTUAL           PIC Z(15)9.
+           05  FILLER                   PIC X(10) VALUE ' EXPECTED '.
+           05  WS-OOBC-EXPECTED         PIC Z(15)9.
        01  WS-TOT-LINE.
            05  FILLER                   PIC X(15) VALUE
                'DETAIL RECORDS '.
@@ -98,6 +105,9 @@
            05  FILLER                   PIC X(11) VALUE '  REJECTED '.
            05  WS-TOT-REJECT            PIC ZZZZZZ9.
            05  FILLER                   PIC X(15) VALUE
+               '  UNKNOWN TYPE '.
+           05  WS-TOT-UNKNOWN           PIC ZZZZZZ9.
+           05  FILLER                   PIC X(14) VALUE
                '  RETURN CODE '.
            05  WS-TOT-RC                PIC 99.
 
@@ -122,6 +132,7 @@
                    WHEN SR-DETAIL  PERFORM 2200-DETAIL
                    WHEN SR-TRAILER PERFORM 2300-TRAILER
                    WHEN OTHER
+                       ADD 1 TO WS-UNKNOWN-COUNT
                        MOVE 'UNKNOWN RECORD TYPE' TO WS-REJ-REASON
                        PERFORM 2900-REJECT
                END-EVALUATE
@@ -194,6 +205,7 @@
                PERFORM 2230-CALCULATE
                ADD 1 TO WS-ACCEPT-COUNT
            ELSE
+               ADD 1 TO WS-REJECT-COUNT
                PERFORM 2900-REJECT
            END-IF.
 
@@ -244,10 +256,9 @@
            MOVE 'Y' TO WS-TRAILER-FLAG
            PERFORM 3000-CLOSE-GROUP
            IF SR-RECORD-COUNT NOT = WS-DETAIL-COUNT
-               MOVE 'DETAIL COUNT' TO WS-OOB-WHAT
-               MOVE WS-DETAIL-COUNT TO WS-OOB-ACTUAL
-               MOVE SR-RECORD-COUNT TO WS-OOB-EXPECTED
-               WRITE REPORT-LINE FROM WS-OOB-LINE
+               MOVE WS-DETAIL-COUNT TO WS-OOBC-ACTUAL
+               MOVE SR-RECORD-COUNT TO WS-OOBC-EXPECTED
+               WRITE REPORT-LINE FROM WS-OOB-CNT-LINE
                MOVE 8 TO WS-RETURN-CODE
            END-IF
            IF SR-HASH-TOTAL NOT = WS-HASH-TOTAL
@@ -263,7 +274,6 @@
            END-IF.
 
        2900-REJECT.
-           ADD 1 TO WS-REJECT-COUNT
            MOVE WS-REC-NO TO WS-REJ-NO
            MOVE SR-MERCHANT-ID TO WS-REJ-MERCHANT
            WRITE REPORT-LINE FROM WS-REJ-LINE.
@@ -286,12 +296,14 @@
                WRITE REPORT-LINE
                MOVE 8 TO WS-RETURN-CODE
            END-IF
-           IF WS-RETURN-CODE = 0 AND WS-REJECT-COUNT > 0
+           IF WS-RETURN-CODE = 0 AND
+              (WS-REJECT-COUNT > 0 OR WS-UNKNOWN-COUNT > 0)
                MOVE 4 TO WS-RETURN-CODE
            END-IF
            MOVE WS-DETAIL-COUNT TO WS-TOT-DETAIL
            MOVE WS-ACCEPT-COUNT TO WS-TOT-ACCEPT
            MOVE WS-REJECT-COUNT TO WS-TOT-REJECT
+           MOVE WS-UNKNOWN-COUNT TO WS-TOT-UNKNOWN
            MOVE WS-RETURN-CODE TO WS-TOT-RC
            WRITE REPORT-LINE FROM WS-TOT-LINE
            CLOSE SETTLE-IN REPORT-OUT.
