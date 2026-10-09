@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "scripts/build.sh",
-    "test": "node --import tsx --test \"test/**/*.test.ts\""
+    "test": "node --import tsx --test \"test/**/*.test.ts\" \"modern/**/*.test.ts\""
   },
   "devDependencies": {
     "@types/node": "^22.13.0",
